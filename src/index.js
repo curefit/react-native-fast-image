@@ -42,6 +42,10 @@ function FastImageBase({
         resolvedDefaultSource = null
     }
 
+    if ((tintColor === null || tintColor === undefined) && style) {
+        tintColor = StyleSheet.flatten(style).tintColor
+    }
+
     if (fallback) {
         return (
             <View style={[styles.imageContainer, style]} ref={forwardedRef}>
