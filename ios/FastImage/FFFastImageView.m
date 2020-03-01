@@ -63,7 +63,10 @@
 - (void)setImageColor:(UIColor *)imageColor {
     if (imageColor != nil) {
         _imageColor = imageColor;
-        super.image = [self makeImage:super.image withTint:self.imageColor];
+        
+        if (super.image) {
+            super.image = [self makeImage:super.image withTint:self.imageColor];
+        }
     }
 }
 
@@ -98,6 +101,13 @@
 - (void)setSource:(FFFastImageSource *)source {
     if (_source != source) {
         _source = source;
+        _needsReload = YES;
+    }
+}
+
+- (void)setDefaultSource:(UIImage *)defaultSource {
+    if (_defaultSource != defaultSource) {
+        _defaultSource = defaultSource;
         _needsReload = YES;
     }
 }
@@ -182,12 +192,15 @@
         
         [self downloadImage:_source options:options];
     }
+    else if (_defaultSource) {
+        [self setImage:_defaultSource];
+    }
 }
 
 - (void)downloadImage:(FFFastImageSource *) source options:(SDWebImageOptions) options {
     __weak typeof(self) weakSelf = self; // Always use a weak reference to self in blocks
     [self sd_setImageWithURL:_source.url
-            placeholderImage:nil
+            placeholderImage:_defaultSource
                      options:options
                     progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
                         if (weakSelf.onFastImageProgress) {
